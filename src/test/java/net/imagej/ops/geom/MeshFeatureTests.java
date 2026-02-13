@@ -37,22 +37,12 @@ import net.imagej.mesh.Mesh;
 import net.imagej.mesh.Triangle;
 import net.imagej.ops.Ops;
 import net.imagej.ops.features.AbstractFeatureTest;
-import net.imagej.ops.geom.geom3d.DefaultBoxivityMesh;
-import net.imagej.ops.geom.geom3d.DefaultCompactness;
-import net.imagej.ops.geom.geom3d.DefaultConvexityMesh;
-import net.imagej.ops.geom.geom3d.DefaultMainElongation;
-import net.imagej.ops.geom.geom3d.DefaultMarchingCubes;
-import net.imagej.ops.geom.geom3d.DefaultMedianElongation;
-import net.imagej.ops.geom.geom3d.DefaultSolidityMesh;
-import net.imagej.ops.geom.geom3d.DefaultSparenessMesh;
-import net.imagej.ops.geom.geom3d.DefaultSphericity;
-import net.imagej.ops.geom.geom3d.DefaultSurfaceArea;
-import net.imagej.ops.geom.geom3d.DefaultSurfaceAreaConvexHullMesh;
-import net.imagej.ops.geom.geom3d.DefaultVerticesCountConvexHullMesh;
-import net.imagej.ops.geom.geom3d.DefaultVerticesCountMesh;
-import net.imagej.ops.geom.geom3d.DefaultVolumeConvexHullMesh;
-import net.imagej.ops.geom.geom3d.DefaultVolumeMesh;
+import net.imagej.ops.geom.geom3d.*;
+import net.imglib2.RandomAccessibleInterval;
+import net.imglib2.algorithm.neighborhood.DiamondShape;
+import net.imglib2.roi.Regions;
 import net.imglib2.roi.labeling.LabelRegion;
+import net.imglib2.type.logic.BitType;
 import net.imglib2.type.numeric.real.DoubleType;
 
 import org.junit.BeforeClass;
@@ -201,6 +191,13 @@ public class MeshFeatureTests extends AbstractFeatureTest {
 
 	@Test
 	public void voxelization3D() {
-		// https://github.com/imagej/imagej-ops/issues/422
+		/*Value of 184 here corresponds with:
+		RandomAccessibleInterval<BitType> result = (RandomAccessibleInterval<BitType>) ops.run(DefaultVoxelization3D.class, mesh, ROI);
+		ops.morphology().fillHoles(result, result, new DiamondShape(1));
+		assertEquals(Ops.Geometric.Voxelization.NAME, ROI.size(), Regions.countTrue(result));
+		 */
+		assertEquals(Ops.Geometric.Voxelization.NAME, 184,
+		Regions.countTrue((RandomAccessibleInterval<BitType>) ops.run(DefaultVoxelization3D.class, mesh, ROI)));
+
 	}
 }

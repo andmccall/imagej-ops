@@ -37,6 +37,7 @@ import net.imagej.ops.Namespace;
 import net.imagej.ops.OpMethod;
 import net.imagej.ops.Ops.Geometric.Voxelization;
 import net.imagej.ops.geom.geom3d.mesh.VertexInterpolator;
+import net.imglib2.Interval;
 import net.imglib2.IterableInterval;
 import net.imglib2.RandomAccessibleInterval;
 import net.imglib2.RealLocalizable;
@@ -278,13 +279,6 @@ public class GeomNamespace extends AbstractNamespace {
 			net.imagej.ops.Ops.Geometric.ConvexHull.class, in);
 		return result;
 	}
-	
-	@OpMethod(op = net.imagej.ops.geom.geom3d.DefaultVoxelization3D.class)
-	public RandomAccessibleInterval<BitType> voxelization(final Mesh in, final int width, final int height, final int depth ) {
-		final RandomAccessibleInterval<BitType> result = (RandomAccessibleInterval<BitType>) ops().run(
-				Voxelization.class, in, width, height, depth );
-	 	return result;
-	}	
 
 	@OpMethod(op = net.imagej.ops.geom.geom2d.DefaultConvexityPolygon.class)
 	public DoubleType convexity(final Polygon2D in) {
@@ -678,26 +672,25 @@ public class GeomNamespace extends AbstractNamespace {
 	
 	@OpMethod(op = net.imagej.ops.geom.geom3d.DefaultVoxelization3D.class)
 	public RandomAccessibleInterval<BitType> voxelization(final Mesh in) {
-		@SuppressWarnings("unchecked")
 		final RandomAccessibleInterval<BitType> result =
 			(RandomAccessibleInterval<BitType>) ops().run(net.imagej.ops.geom.geom3d.DefaultVoxelization3D.class, in);
 		return result;
 	}
 
 	@OpMethod(op = net.imagej.ops.geom.geom3d.DefaultVoxelization3D.class)
-	public RandomAccessibleInterval<BitType> voxelization(final Mesh in, final int width) {
-		@SuppressWarnings("unchecked")
+	public RandomAccessibleInterval<BitType> voxelization(final Mesh in, final Interval dimensions) {
 		final RandomAccessibleInterval<BitType> result =
-			(RandomAccessibleInterval<BitType>) ops().run(net.imagej.ops.geom.geom3d.DefaultVoxelization3D.class, in, width);
+			(RandomAccessibleInterval<BitType>) ops().run(net.imagej.ops.geom.geom3d.DefaultVoxelization3D.class, in, dimensions);
 		return result;
 	}
 
 	@OpMethod(op = net.imagej.ops.geom.geom3d.DefaultVoxelization3D.class)
-	public RandomAccessibleInterval<BitType> voxelization(final Mesh in, final int width, final int height) {
+	public RandomAccessibleInterval<BitType> voxelization(final Mesh in, final Interval dimensions, boolean scaleMeshToDimesions) {
 		final RandomAccessibleInterval<BitType> result =
-			(RandomAccessibleInterval<BitType>) ops().run(net.imagej.ops.geom.geom3d.DefaultVoxelization3D.class, in, width, height);
+				(RandomAccessibleInterval<BitType>) ops().run(net.imagej.ops.geom.geom3d.DefaultVoxelization3D.class, in, dimensions, scaleMeshToDimesions);
 		return result;
 	}
+
 	
 	@OpMethod(op = net.imagej.ops.geom.geom2d.DefaultVerticesCountPolygon.class)
 	public DoubleType verticesCount(final Polygon2D in) {
