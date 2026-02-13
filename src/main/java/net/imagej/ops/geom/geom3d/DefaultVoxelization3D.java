@@ -67,9 +67,6 @@ public class DefaultVoxelization3D extends AbstractUnaryFunctionOp<Mesh, RandomA
 	@Parameter
 	private OpService ops;
 
-	@Parameter
-	private LogService logService;
-
 	private final double wallThickness = 1.0; //This could be made into a parameter if needed
 	private final long[] offset = new long[] {0,0,0};
 	private double scale = 1.0;
