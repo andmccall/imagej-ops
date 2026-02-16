@@ -78,7 +78,7 @@ public class DefaultVoxelization3D extends AbstractUnaryFunctionOp<Mesh, RandomA
 			float[] bounds = Meshes.boundingBox(input);
 			long[] outputInterval = new long[3];
 			for (int i = 0; i < 3; i++) {
-				outputInterval[i] = (long)Math.ceil(bounds[i+3]-bounds[i])+1;
+				outputInterval[i] = (long)Math.ceil(bounds[i+3]-bounds[i])+2;
 			}
 			dimensions = new FinalInterval(outputInterval);
 			setScale(input, bounds);
