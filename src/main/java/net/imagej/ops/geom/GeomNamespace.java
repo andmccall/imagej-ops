@@ -691,6 +691,28 @@ public class GeomNamespace extends AbstractNamespace {
 		return result;
 	}
 
+	//Two OpMethods below cause a Mismatched inputs error, though they both work fine if built with 'Skip tests'
+//	@OpMethod(op = net.imagej.ops.geom.geom3d.DefaultVoxelization3D.class)
+//	public RandomAccessibleInterval<BitType> voxelization(final Mesh in, double wallThickness) {
+//		final RandomAccessibleInterval<BitType> result =
+//				(RandomAccessibleInterval<BitType>) ops().run(net.imagej.ops.geom.geom3d.DefaultVoxelization3D.class, in, null, false, wallThickness);
+//		return result;
+//	}
+//
+//	@OpMethod(op = net.imagej.ops.geom.geom3d.DefaultVoxelization3D.class)
+//	public RandomAccessibleInterval<BitType> voxelization(final Mesh in, final Interval dimensions, double wallThickness) {
+//		final RandomAccessibleInterval<BitType> result =
+//				(RandomAccessibleInterval<BitType>) ops().run(net.imagej.ops.geom.geom3d.DefaultVoxelization3D.class, in, dimensions, false, wallThickness);
+//		return result;
+//	}
+
+	@OpMethod(op = net.imagej.ops.geom.geom3d.DefaultVoxelization3D.class)
+	public RandomAccessibleInterval<BitType> voxelization(final Mesh in, final Interval dimensions, boolean scaleMeshToDimesions, double wallThickness) {
+		final RandomAccessibleInterval<BitType> result =
+				(RandomAccessibleInterval<BitType>) ops().run(net.imagej.ops.geom.geom3d.DefaultVoxelization3D.class, in, dimensions, scaleMeshToDimesions, wallThickness);
+		return result;
+	}
+
 	
 	@OpMethod(op = net.imagej.ops.geom.geom2d.DefaultVerticesCountPolygon.class)
 	public DoubleType verticesCount(final Polygon2D in) {

@@ -42,13 +42,12 @@ import net.imglib2.type.logic.BitType;
 import net.imglib2.util.Intervals;
 import org.apache.commons.math3.geometry.euclidean.threed.Vector3D;
 import org.scijava.ItemIO;
-import org.scijava.log.LogService;
 import org.scijava.plugin.Parameter;
 import org.scijava.plugin.Plugin;
 
 /**
  * <p>
- * This is a voxelizer that produces a binary image with values filled in along
+ * This is a voxelizer that produces a binary image with values set to true along
  * the surface of the mesh.
  * </p>
  * 
@@ -67,7 +66,9 @@ public class DefaultVoxelization3D extends AbstractUnaryFunctionOp<Mesh, RandomA
 	@Parameter
 	private OpService ops;
 
-	private final double wallThickness = 1.0; //This could be made into a parameter if needed
+	@Parameter(type = ItemIO.INPUT, required = false)
+	private double wallThickness = 1.0;
+
 	private final long[] offset = new long[] {0,0,0};
 	private double scale = 1.0;
 
@@ -78,10 +79,10 @@ public class DefaultVoxelization3D extends AbstractUnaryFunctionOp<Mesh, RandomA
 			float[] bounds = Meshes.boundingBox(input);
 			long[] outputInterval = new long[3];
 			for (int i = 0; i < 3; i++) {
-				outputInterval[i] = (long)Math.ceil(bounds[i+3]-bounds[i]);
+				outputInterval[i] = (long)Math.ceil(bounds[i+3]+(2*wallThickness)-bounds[i]);
 			}
 			dimensions = new FinalInterval(outputInterval);
-			setScale(input, bounds);
+			setScale(bounds);
 			scaleMeshToDimesions = false;
 		}
 
@@ -99,10 +100,8 @@ public class DefaultVoxelization3D extends AbstractUnaryFunctionOp<Mesh, RandomA
 			while (it.hasNext()) {
 				it.fwd();
 				if(Intervals.contains(dimensions, it.positionAsPoint())) {
-					if (pointToTriangleDist(new Vector3D(it.getDoublePosition(0), it.getDoublePosition(1), it.getDoublePosition(2)), scaledT) < wallThickness/2) {
-						synchronized (ra) {
+					if (pointToTriangleDist(new Vector3D(it.getDoublePosition(0), it.getDoublePosition(1), it.getDoublePosition(2)), scaledT) <= wallThickness/2) {
 							ra.setPositionAndGet(it.positionAsPoint()).set(true);
-						}
 					}
 				}
 			}
@@ -121,14 +120,14 @@ public class DefaultVoxelization3D extends AbstractUnaryFunctionOp<Mesh, RandomA
 	}
 
 	private void setScale(Mesh input){
-		setScale(input, Meshes.boundingBox(input));
+		setScale(Meshes.boundingBox(input));
 	}
 
-	private void setScale(Mesh input, float[] bounds) {
+	private void setScale(float[] bounds) {
 		double[] axisScaling = new double[3];
 		for (int i = 0; i < 3; i++) {
-			offset[i] = (long) Math.floor(bounds[i]) - dimensions.min(i);
-			axisScaling[i] = (dimensions.max(i) - dimensions.min(i)) / ((bounds[i + 3]+2) - bounds[i]);
+			offset[i] = Math.round(bounds[i] - (dimensions.min(i)+wallThickness));
+			axisScaling[i] = ((dimensions.max(i)-2*wallThickness) - (dimensions.min(i))) / (bounds[i + 3] - bounds[i]);
 		}
 		scale = Math.min(axisScaling[0], Math.min(axisScaling[1], axisScaling[2]));
 	}
@@ -214,7 +213,6 @@ public class DefaultVoxelization3D extends AbstractUnaryFunctionOp<Mesh, RandomA
 		double w = (acDOTac * abDOTap - abDOTac * acDOTap)/denom; //coordinate towards b from a
 		double v = (abDOTab * acDOTap - abDOTac * abDOTap)/denom; //coordinate towards c from a
 
-
 		// Check barycentric coordinates
 		if ((v >= 0) && (w >= 0) && (v + w <= 1)) {
 			// Nearest orthogonal projection point is in triangle
@@ -239,7 +237,6 @@ public class DefaultVoxelization3D extends AbstractUnaryFunctionOp<Mesh, RandomA
 		if (v <=0 && w <= 0){ //this should be redundant, but for some reason isn't
 			return t[0];
 		}
-
 		return new Vector3D(-100,-100,-100);
 	}
 }
